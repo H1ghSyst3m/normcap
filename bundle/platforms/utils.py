@@ -131,7 +131,7 @@ class BuilderBase(ABC):
         url_prefix = (
             "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/4.1.0"
         )
-        files = ["eng.traineddata"]
+        files = ["eng.traineddata", "deu.traineddata"]
         if len(list(target_path.glob("*.traineddata"))) >= len(files):
             return
 
@@ -157,9 +157,9 @@ class BuilderBase(ABC):
 
         if comment_prefix:
             patch = (
-                f"{comment_prefix} dynobo: {patch_hash} >>>>>>>>>>>>>>\n"
+                f"{comment_prefix} H1ghSyst3m: {patch_hash} >>>>>>>>>>>>>>\n"
                 + patch
-                + f"{comment_prefix} dynobo: {patch_hash} <<<<<<<<<<<<<<\n"
+                + f"{comment_prefix} H1ghSyst3m: {patch_hash} <<<<<<<<<<<<<<\n"
             )
 
         patch_applied = False

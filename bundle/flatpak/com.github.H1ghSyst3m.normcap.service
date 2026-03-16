@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=com.github.H1ghSyst3m.normcap
+Exec=/app/bin/normcap --dbus-activation

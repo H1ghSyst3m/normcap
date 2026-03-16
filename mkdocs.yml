@@ -1,6 +1,6 @@
 site_name: NormCap
-repo_url: https://github.com/dynobo/normcap
-repo_name: dynobo/normcap
+repo_url: https://github.com/H1ghSyst3m/normcap
+repo_name: H1ghSyst3m/normcap
 edit_uri: edit/main/docs/
 docs_dir: ./docs
 site_dir: ./site
@@ -55,7 +55,6 @@ theme:
 nav:
   - index.md
   - usage.md
-  - faqs.md
   - support.md
   - contribute.md
 

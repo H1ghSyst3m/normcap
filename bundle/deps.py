@@ -82,7 +82,7 @@ def install_deps(system: System) -> None:
 def main() -> None:
     system = identify_system()
     install_deps(system=system)
-    run("xdg-open https://github.com/dynobo/normcap/releases")
+    run("xdg-open https://github.com/H1ghSyst3m/normcap/releases")
 
 
 if __name__ == "__main__":

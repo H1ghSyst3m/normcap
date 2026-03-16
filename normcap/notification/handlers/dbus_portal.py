@@ -114,7 +114,7 @@ def notify(
             notification_data: dict[str, tuple[str, object]] = {
                 "title": ("s", title),
                 "body": ("s", message),
-                "icon": ("(sv)", ("themed", ("as", ["com.github.dynobo.normcap"]))),
+                "icon": ("(sv)", ("themed", ("as", [app_id]))),
                 "default-action": ("s", "app.activate"),
                 "priority": ("s", "urgent"),
                 "buttons": (

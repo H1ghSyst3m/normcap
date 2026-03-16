@@ -12,20 +12,20 @@ hide:
 <p class="md-subtitle">OCR-powered screenshot tool to capture text<br> instead of images.</p>
 
 Packages with the
-[latest changes](https://github.com/dynobo/normcap/blob/main/CHANGELOG) for your system:
+[latest changes](https://github.com/H1ghSyst3m/normcap/blob/main/CHANGELOG) for your system:
 
 <div class="annotate" markdown>
-- [Download for **Windows**](https://github.com/dynobo/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64-Windows.msi)
+- [Download for **Windows**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64-Windows.msi)
   <small>Installer, x86_64, ~120 MB</small>
-- [Download for **Windows**](https://github.com/dynobo/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64-Windows.zip)
+- [Download for **Windows**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64-Windows.zip)
   <small>Portable, x86_64, ~120 MB</small>
-- [Download for **Linux (via Flathub)**](https://flathub.org/apps/details/com.github.dynobo.normcap)
+- [Download for **Linux (via Flathub)**](https://flathub.org/apps/details/com.github.H1ghSyst3m.normcap)
   <small>x86_64, ~350 MB</small>
-- [Download for **Linux (AppImage)¹**](https://github.com/dynobo/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64.AppImage)
+- [Download for **Linux (AppImage)¹**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64.AppImage)
   <small>x86_64, ~90 MB</small>
-- [Download for **macOS**](https://github.com/dynobo/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64-macOS.dmg)
+- [Download for **macOS**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64-macOS.dmg)
   <small>x86_64, ~80 MB</small>
-- [Download for **macOS (M1)**](https://github.com/dynobo/normcap/releases/download/v0.6.0/NormCap-0.6.0-arm64-macOS.dmg)
+- [Download for **macOS (M1)**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-arm64-macOS.dmg)
   <small>arm64, ~65 MB</small>
 </div>
 
@@ -38,7 +38,6 @@ Packages with the
 
 <div style="display:flex;align-items:center;text-align:center;" markdown>
 ![Image title](assets/normcap.gif)
-[![Image title](assets/coffee.png){ style=height:40px;opacity:0.9; }](https://www.buymeacoffee.com/dynobo)
 </div>
 
 </div>
@@ -54,8 +53,6 @@ Packages with the
 
 Use Tesseract's diverse [language models](https://tesseract-ocr.github.io/tessdoc/Data-Files) for text detection.
 
-[:octicons-arrow-right-24: Add languages](faqs.md#how-can-i-add-additional-languages-to-normcap)
-
 </div>
 
 <div class="card" markdown>
@@ -65,8 +62,6 @@ Use Tesseract's diverse [language models](https://tesseract-ocr.github.io/tessdo
 ---
 
 Detection is performed on your device and no telemetry data is collected.
-
-[:octicons-arrow-right-24: Learn more](faqs.md#is-any-data-send-to-the-internet)
 
 </div>
 
@@ -121,9 +116,9 @@ Available for Windows :material-microsoft-windows: & macOS :material-apple: & Li
 
 ---
 
-NormCap is licensed under GPLv3 and available on [GitHub](https://github.com/dynobo/normcap/tree/main).
+NormCap is licensed under GPLv3 and available on [GitHub](https://github.com/H1ghSyst3m/normcap/tree/main).
 
-[:octicons-arrow-right-24: See license](https://github.com/dynobo/normcap/blob/main/LICENSE)
+[:octicons-arrow-right-24: See license](https://github.com/H1ghSyst3m/normcap/blob/main/LICENSE)
 
 </div>
 

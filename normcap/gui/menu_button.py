@@ -1,13 +1,17 @@
 """Create the settings button and its menu."""
 
 import logging
-import sys
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from normcap import __version__
-from normcap.gui.constants import URLS
 from normcap.gui.localization import _
+from normcap.gui.settings_defs import (
+    APPLICATION_LINKS,
+    DETECTION_SECTION,
+    POSTPROCESSING_SECTION,
+    SETTINGS_SECTION,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -225,99 +229,39 @@ class MenuButton(QtWidgets.QToolButton):
         settings_group.setObjectName("settings_group")
         settings_group.setExclusive(False)
 
-        # L10N: Entry in main menu's 'setting' section
-        action = QtGui.QAction(_("Show notification"), settings_group)
-        action.setObjectName("notification")
-        action.setCheckable(True)
-        action.setChecked(bool(self.settings.value("notification", type=bool)))
-        # L10N: Tooltip of main menu's "Show notification" entry. Use <56 chars p. line.
-        notification_tooltip = _(
-            "Show status information via your system's desktop\nnotification center."
-        )
-        if sys.platform in {"darwin", "win32"}:
-            notification_tooltip += (
-                # L10N: Extension "Show notification"-Tooltip on macOS and Windows.
-                f"\n({_('Click on the notification to open the result')})"
-            )
-        action.setToolTip(notification_tooltip)
-        menu.addAction(action)
-
-        # L10N: Entry in main menu's 'setting' section
-        action = QtGui.QAction(_("Keep in system tray"), settings_group)
-        action.setObjectName("tray")
-        action.setCheckable(True)
-        action.setChecked(bool(self.settings.value("tray", type=bool)))
-        # L10N: Tooltip of main menu's "Keep in tray" entry. Use <56 chars p. line.
-        action.setToolTip(
-            _(
-                "Keep NormCap running in the background. Another\n"
-                "capture can be triggered via the tray icon."
-            )
-        )
-        menu.addAction(action)
-
-        # L10N: Entry in main menu's 'setting' section
-        action = QtGui.QAction(_("Check for update"), settings_group)
-        action.setObjectName("update")
-        action.setCheckable(True)
-        action.setChecked(bool(self.settings.value("update", type=bool)))
-        # L10N: Tooltip of main menu's "Update" entry. Use <56 chars p. line.
-        action.setToolTip(
-            _(
-                "Frequently fetch NormCap's releases online and display\n"
-                "a message if a new version is available."
-            )
-        )
-        menu.addAction(action)
+        for defn in SETTINGS_SECTION:
+            action = QtGui.QAction(defn.label(), settings_group)
+            action.setObjectName(defn.key)
+            action.setCheckable(True)
+            action.setChecked(bool(self.settings.value(defn.key, type=bool)))
+            action.setToolTip(defn.tooltip())
+            menu.addAction(action)
 
     def _add_postprocessing_section(self, menu: QtWidgets.QMenu) -> None:
         postprocessing_group = QtGui.QActionGroup(menu)
         postprocessing_group.setObjectName("postprocessing_group")
         postprocessing_group.setExclusive(False)
 
-        # L10N: Entry in main menu's 'Detection' section
-        action = QtGui.QAction(_("Parse text"), postprocessing_group)
-        action.setObjectName("parse-text")
-        action.setCheckable(True)
-        action.setChecked(bool(self.settings.value("parse-text", type=bool)))
-        # L10N: Tooltip of main menu's 'parse text' entry. Use <56 chars p. line.
-        action.setToolTip(
-            _(
-                "Tries to determine the text's type (e.g. line,\n"
-                "paragraph, URL, email) and formats the output\n"
-                "accordingly.\n"
-                "Turn it off to return the text exactly as detected\n"
-                "by the Optical Character Recognition Software."
-            )
-        )
-        menu.addAction(action)
+        for defn in POSTPROCESSING_SECTION:
+            action = QtGui.QAction(defn.label(), postprocessing_group)
+            action.setObjectName(defn.key)
+            action.setCheckable(True)
+            action.setChecked(bool(self.settings.value(defn.key, type=bool)))
+            action.setToolTip(defn.tooltip())
+            menu.addAction(action)
 
     def _add_detection_section(self, menu: QtWidgets.QMenu) -> None:
         detection_group = QtGui.QActionGroup(menu)
         detection_group.setObjectName("detection_group")
         detection_group.setExclusive(False)
 
-        action = QtGui.QAction(_("Text"), detection_group)
-        action.setObjectName("detect-text")
-        action.setCheckable(True)
-        action.setChecked(bool(self.settings.value("detect-text", type=bool)))
-        # L10N: Tooltip of main menu's 'Text' entry. Use <56 chars p. line.
-        action.setToolTip(_("Tries to detect text in the selected region using OCR."))
-        menu.addAction(action)
-
-        # L10N: Entry in main menu's 'Detection' section
-        action = QtGui.QAction(_("QR && Barcodes"), detection_group)
-        action.setObjectName("detect-codes")
-        action.setCheckable(True)
-        action.setChecked(bool(self.settings.value("detect-codes", type=bool)))
-        # L10N: Tooltip of main menu's 'QR & Barcodes' entry. Use <56 chars p. line.
-        action.setToolTip(
-            _(
-                "Detects Barcodes and QR codes. If one or more codes are found,\n"
-                "text detection (OCR) is skipped and only the codes' data is returned."
-            )
-        )
-        menu.addAction(action)
+        for defn in DETECTION_SECTION:
+            action = QtGui.QAction(defn.label(), detection_group)
+            action.setObjectName(defn.key)
+            action.setCheckable(True)
+            action.setChecked(bool(self.settings.value(defn.key, type=bool)))
+            action.setToolTip(defn.tooltip())
+            menu.addAction(action)
 
     def _add_languages_section(self, menu: QtWidgets.QMenu) -> None:
         overflow_languages_count = 7
@@ -365,35 +309,10 @@ class MenuButton(QtWidgets.QToolButton):
         action.setObjectName("show_introduction")
         submenu.addAction(action)
 
-        # L10N: Entry in main menu's 'Application' section.
-        action = QtGui.QAction(_("Website"), about_group)
-        action.setObjectName(URLS.website)
-        submenu.addAction(action)
-
-        # L10N: Entry in main menu's 'Application' section.
-        action = QtGui.QAction(_("FAQs"), about_group)
-        action.setObjectName(URLS.faqs)
-        submenu.addAction(action)
-
-        # L10N: Entry in main menu's 'Application' section.
-        action = QtGui.QAction(_("Source code"), about_group)
-        action.setObjectName(URLS.github)
-        submenu.addAction(action)
-
-        # L10N: Entry in main menu's 'Application' section.
-        action = QtGui.QAction(_("Releases"), about_group)
-        action.setObjectName(URLS.releases)
-        submenu.addAction(action)
-
-        # L10N: Entry in main menu's 'Application' section.
-        action = QtGui.QAction(_("Report a problem"), about_group)
-        action.setObjectName(URLS.issues)
-        submenu.addAction(action)
-
-        # L10N: Entry in main menu's 'Application' section.
-        action = QtGui.QAction(_("Donate for coffee"), about_group)
-        action.setObjectName(URLS.buymeacoffee)
-        submenu.addAction(action)
+        for label_fn, url in APPLICATION_LINKS:
+            action = QtGui.QAction(label_fn(), about_group)
+            action.setObjectName(url)
+            submenu.addAction(action)
 
         menu.addMenu(submenu)
 

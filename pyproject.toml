@@ -10,7 +10,7 @@ keywords = [ "screenshot", "ocr", "capture", "clipboard" ]
 readme = "README.md"
 requires-python = ">=3.10"
 license.file = "LICENSE"
-authors = [ { name = "dynobo", email = "dynobo@mailbox.org" } ]
+authors = [ { name = "H1ghSyst3m", email = "durmazmalik@protonmail.com" } ]
 classifiers = [
   "Development Status :: 4 - Beta",
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
@@ -38,12 +38,10 @@ dependencies = [
 build = [ "babel", "toml" ]
 
 [project.urls]
-Homepage = "https://dynobo.github.io/normcap/"
-Issues = "https://github.com/dynobo/normcap/issues"
-"Source Code" = "https://github.com/dynobo/normcap"
-FAQs = "https://dynobo.github.io/normcap/#faqs"
-Changelog = "https://github.com/dynobo/normcap/blob/main/CHANGELOG"
-BuyMeACoffee = "https://www.buymeacoffee.com/dynobo"
+Homepage = "https://H1ghSyst3m.github.io/normcap/"
+Issues = "https://github.com/H1ghSyst3m/normcap/issues"
+"Source Code" = "https://github.com/H1ghSyst3m/normcap"
+Changelog = "https://github.com/H1ghSyst3m/normcap/blob/main/CHANGELOG"
 
 [project.scripts]
 normcap = "normcap.app:run"
@@ -247,7 +245,7 @@ max_cluster_size = 1
 
 [tool.briefcase]
 project_name = "normcap"
-bundle = "com.github.dynobo"
+bundle = "com.github.H1ghSyst3m"
 requirement_installer_args = [ "-vv" ]
 
 [tool.briefcase.app.normcap]
@@ -398,7 +396,7 @@ cmd = "grep -q {new_version} CHANGELOG"
 
 [[tool.tbump.before_commit]]
 name = "check appdata.xml"
-cmd = "grep -q {new_version} bundle/flatpak/com.github.dynobo.normcap.appdata.xml"
+cmd = "grep -q {new_version} bundle/flatpak/com.github.H1ghSyst3m.normcap.appdata.xml"
 
 [[tool.tbump.before_commit]]
 name = "uv sync"

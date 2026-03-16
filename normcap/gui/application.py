@@ -9,7 +9,7 @@ from typing import Any, TypeAlias
 
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from normcap import app_id, clipboard, notification, screenshot
+from normcap import app_id, autostart, clipboard, hotkey, notification, screenshot
 from normcap.detection import detector, ocr
 from normcap.detection.models import DetectionMode, DetectionResult
 from normcap.gui import (
@@ -22,6 +22,7 @@ from normcap.gui import (
 from normcap.gui.dbus_application_service import DBusApplicationService
 from normcap.gui.language_manager import LanguageManager
 from normcap.gui.settings import Settings
+from normcap.gui.settings_dialog import SettingsDialog
 from normcap.gui.socket_server import SocketServer
 from normcap.gui.tray import SystemTray
 from normcap.gui.update_check import UpdateChecker
@@ -57,6 +58,7 @@ class NormcapApp(QtWidgets.QApplication):
     # Only for testing purposes: forcefully enables language manager in settings menu
     # (Normally language manager is only available in pre-build version)
     _DEBUG_LANGUAGE_MANAGER = False
+    _settings_dialog: SettingsDialog | None = None
 
     def __init__(self, args: dict[str, Any]) -> None:
         super().__init__()
@@ -142,8 +144,17 @@ class NormcapApp(QtWidgets.QApplication):
         self.tray.com.on_menu_capture_clicked.connect(
             lambda: self._show_windows(delay_screenshot=True)
         )
+        self.tray.com.on_menu_settings_clicked.connect(self._open_settings_dialog)
         self.settings.com.on_value_changed.connect(self.tray.apply_setting_change)
         self.tray.show()
+
+        # Register global hotkey (Windows only, tray mode only)
+        self._setup_hotkey()
+        self.settings.com.on_value_changed.connect(self._on_hotkey_setting_changed)
+
+        # Enable autostart (Windows only)
+        self._setup_autostart()
+        self.settings.com.on_value_changed.connect(self._on_autostart_setting_changed)
 
         # Defer non-crucial init to faster be interactive
         QtCore.QTimer.singleShot(50, self._delayed_init)
@@ -151,15 +162,24 @@ class NormcapApp(QtWidgets.QApplication):
     @QtCore.Slot()
     def show_introduction(self) -> None:
         show_intro = bool(self.settings.value("show-introduction", type=bool))
-        result = introduction.IntroductionDialog(
+        autostart_val = bool(self.settings.value("autostart", type=bool))
+        dlg = introduction.IntroductionDialog(
             show_on_startup=show_intro,
+            autostart=autostart_val,
             parent=self.windows[0] if self.windows else None,
-        ).exec()
+        )
+        result = dlg.exec()
 
         if result == introduction.Choice.SHOW:
             self.settings.setValue("show-introduction", True)
         elif result == introduction.Choice.DONT_SHOW:
             self.settings.setValue("show-introduction", False)
+
+        if (
+            dlg.autostart_checkbox is not None
+            and result != introduction.Choice.REJECTED
+        ):
+            self.settings.setValue("autostart", dlg.autostart_checkbox.isChecked())
 
     @QtCore.Slot()
     def show_permissions_info(self) -> None:
@@ -430,6 +450,64 @@ class NormcapApp(QtWidgets.QApplication):
 
         return screens
 
+    def _setup_hotkey(self) -> None:
+        if sys.platform != "win32":
+            return
+        if not self.settings.value("tray", type=bool):
+            return
+        hotkey_str = str(self.settings.value("hotkey") or "")
+        if hotkey_str:
+            hotkey.register(
+                hotkey=hotkey_str,
+                app=self,
+                callback=lambda: self._show_windows(delay_screenshot=True),
+            )
+
+    @QtCore.Slot(str, object)
+    def _on_hotkey_setting_changed(self, key: str, _value: object) -> None:
+        if sys.platform != "win32":
+            return
+        if key not in {"hotkey", "tray"}:
+            return
+        tray_enabled = bool(self.settings.value("tray", type=bool))
+        hotkey_str = str(self.settings.value("hotkey") or "")
+        if not tray_enabled or not hotkey_str:
+            hotkey.unregister(app=self)
+            return
+        success = hotkey.register(
+            hotkey=hotkey_str,
+            app=self,
+            callback=lambda: self._show_windows(delay_screenshot=True),
+        )
+        if not success:
+            logger.warning(
+                "Failed to register hotkey %r; the global hotkey may be inactive.",
+                hotkey_str,
+            )
+
+    def _setup_autostart(self) -> None:
+        if sys.platform != "win32" or not info.is_briefcase_package():
+            return
+        if self.settings.value("autostart", type=bool):
+            if not autostart.enable():
+                logger.warning("Failed to enable autostart.")
+                self.settings.setValue("autostart", False)
+        else:
+            autostart.disable()
+
+    @QtCore.Slot(str, object)
+    def _on_autostart_setting_changed(self, key: str, _value: object) -> None:
+        if sys.platform != "win32" or not info.is_briefcase_package():
+            return
+        if key != "autostart":
+            return
+        if self.settings.value("autostart", type=bool):
+            if not autostart.enable():
+                logger.warning("Failed to enable autostart.")
+                self.settings.setValue("autostart", False)
+        else:
+            autostart.disable()
+
     def _delayed_init(self) -> None:
         """Setup things that can be done independent of the first capture.
 
@@ -450,20 +528,61 @@ class NormcapApp(QtWidgets.QApplication):
             ),
         )
         self._sanitize_language_setting()
+        if self._settings_dialog is not None:
+            self._settings_dialog.refresh_languages(self.installed_languages)
+        for window in self.windows.values():
+            if window.menu_button is not None:
+                window.menu_button.installed_languages = self.installed_languages
 
     @QtCore.Slot()
     def _open_language_manager(self) -> None:
-        """Open url in default browser, then hide to tray or exit."""
+        """Open the Language Manager dialog for managing OCR languages."""
         logger.debug("Loading language manager …")
+        parent: QtWidgets.QWidget | None = self.activeWindow()
+        if (
+            parent is None
+            and self._settings_dialog is not None
+            and self._settings_dialog.isVisible()
+        ):
+            parent = self._settings_dialog
+        if parent is None:
+            parent = self.windows.get(0)
         self.language_window = LanguageManager(
             tessdata_path=info.config_directory() / "tessdata",
-            parent=self.windows[0],
+            parent=parent,
         )
         self.language_window.com.on_open_url.connect(self._open_url_and_hide)
         self.language_window.com.on_languages_changed.connect(
             self._update_installed_languages
         )
         self.language_window.exec()
+
+    @QtCore.Slot()
+    def _open_settings_dialog(self) -> None:
+        """Open a standalone settings dialog from the tray menu."""
+        if self._settings_dialog is None:
+            self._settings_dialog = SettingsDialog(
+                settings=self.settings,
+                installed_languages=self.installed_languages,
+                show_language_manager=(
+                    self._DEBUG_LANGUAGE_MANAGER or info.is_packaged()
+                ),
+            )
+            self._settings_dialog.com.on_open_url.connect(
+                lambda url: QtGui.QDesktopServices.openUrl(
+                    QtCore.QUrl(url, QtCore.QUrl.ParsingMode.TolerantMode)
+                )
+            )
+            self._settings_dialog.com.on_manage_languages.connect(
+                self._open_language_manager
+            )
+            self._settings_dialog.com.on_show_introduction.connect(
+                self.show_introduction
+            )
+
+        self._settings_dialog.show()
+        self._settings_dialog.raise_()
+        self._settings_dialog.activateWindow()
 
     @QtCore.Slot(list)
     def _sanitize_language_setting(
@@ -488,6 +607,9 @@ class NormcapApp(QtWidgets.QApplication):
         if delay:
             QtCore.QTimer.singleShot(int(delay * 1000), self._exit_application)
             return
+
+        if sys.platform == "win32":
+            hotkey.unregister(app=self)
 
         if hasattr(self, "tray"):
             # Hide avoids having the icon dangling in system tray for a few seconds

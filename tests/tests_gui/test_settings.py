@@ -38,7 +38,7 @@ def test_update_from_init_settings(caplog):
 def test_set_missing_to_default(caplog):
     default_parse_text = True
     non_default_parse_text = False
-    default_language = "eng"
+    default_language = ["eng", "deu"]
 
     try:
         settings = Settings(organization="normcap_TEST")

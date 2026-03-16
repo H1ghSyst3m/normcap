@@ -5,15 +5,24 @@
 ## v0.7.0 (upcoming)
 
 **All systems:**
-- 🗲 Breaking: Drop support for Python 3.9.
-- Fix unresposive window when selecting larger screen regions.
+- 🗲 Breaking: Drop support for Python 3.9. *(upstream)*
+- Fix unresposive window when selecting larger screen regions. *(upstream)*
+- Add new Settings Dialog with redesigned UI for managing application preferences.
 
 **Windows**:
-- Fix crash on `NormCap.exe --help`. ([#783](https://github.com/dynobo/normcap/issues/783))
+- Fix crash on `NormCap.exe --help`. ([#783](https://github.com/dynobo/normcap/issues/783)) *(upstream)*
+- Add Autostart support: NormCap can now be configured to start automatically with Windows.
+- Add Global Hotkeys: Trigger NormCap capture from anywhere using a configurable global keyboard shortcut.
 
 **Linux**:
-- Add clickable desktop notifications in FlatPak package.
-- Add a new clipboard-handler `qt_wayland` to improve reliabilty of writing to clipboard on Wayland systems.
+- Add clickable desktop notifications in FlatPak package. *(upstream)*
+- Add a new clipboard-handler `qt_wayland` to improve reliabilty of writing to clipboard on Wayland systems. *(upstream)*
+
+---
+
+> ⬇️ The following entries are from the original [dynobo/normcap](https://github.com/dynobo/normcap) repository.
+
+---
 
 ## v0.6.0 (2025-08-31)
 

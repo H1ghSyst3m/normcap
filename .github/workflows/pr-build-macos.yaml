@@ -4,8 +4,8 @@
 name: PR Build – macOS
 
 on:
-  # DISABLED: pull_request:
-  #   types: [opened, synchronize, reopened]
+  pull_request:
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 concurrency:

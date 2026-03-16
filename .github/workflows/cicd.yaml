@@ -27,10 +27,10 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          # DISABLED: - macos-14
-          # DISABLED: - macos-15
-          # DISABLED: - ubuntu-22.04
-          # DISABLED: - ubuntu-24.04
+          - macos-14
+          - macos-15
+          - ubuntu-22.04
+          - ubuntu-24.04
           - windows-2022
           - windows-2025
     steps:

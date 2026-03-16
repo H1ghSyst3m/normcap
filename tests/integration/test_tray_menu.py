@@ -1,7 +1,7 @@
 from difflib import SequenceMatcher
 
 import pytest
-from PySide6 import QtGui
+from PySide6 import QtGui, QtWidgets
 
 from normcap.gui.application import screenshot
 
@@ -18,6 +18,44 @@ def test_tray_menu_exit(monkeypatch, qtbot, qapp):
     exit_action = qapp.tray.tray_menu.findChild(QtGui.QAction, "exit")
     with qtbot.waitSignal(qapp.com.on_exit_application):
         exit_action.trigger()
+
+
+@pytest.mark.gui
+def test_tray_menu_settings(qtbot, qapp):
+    """Test if settings dialog can be opened through tray icon."""
+    # GIVEN NormCap is running (background-mode, no capture windows open)
+    assert len(qapp.windows) == 0
+
+    # WHEN "settings" is clicked in system tray menu
+    qapp.tray.tray_menu.show()
+    settings_action = qapp.tray.tray_menu.findChild(QtGui.QAction, "settings")
+    assert settings_action is not None, "Settings action not found in tray menu"
+
+    with qtbot.waitSignal(qapp.tray.com.on_menu_settings_clicked, timeout=2000):
+        settings_action.trigger()
+
+    # THEN the settings dialog should be open and contain expected widgets
+    qtbot.waitUntil(
+        lambda: (
+            getattr(qapp, "_settings_dialog", None) is not None
+            and qapp._settings_dialog.isVisible()
+        ),
+        timeout=2000,
+    )
+    dialog = qapp._settings_dialog
+    assert dialog.isVisible()
+    assert "NormCap Settings" in dialog.windowTitle()
+
+    notification_cb = dialog.findChild(QtWidgets.QCheckBox, "notification")
+    assert notification_cb is not None
+
+    detect_text_cb = dialog.findChild(QtWidgets.QCheckBox, "detect-text")
+    assert detect_text_cb is not None
+
+    parse_text_cb = dialog.findChild(QtWidgets.QCheckBox, "parse-text")
+    assert parse_text_cb is not None
+
+    dialog.close()
 
 
 @pytest.mark.gui

@@ -123,6 +123,8 @@ def test_settings_in_argparser_attributes():
         "current-version",
         "last-update-check",
         "has-screenshot-permission",
+        "hotkey",
+        "autostart",
     }
     for key in settings.allKeys():
         if key in settings_without_arg:

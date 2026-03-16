@@ -29,6 +29,7 @@ class Communicate(QtCore.QObject):
 
     on_tray_clicked = QtCore.Signal()
     on_menu_capture_clicked = QtCore.Signal()
+    on_menu_settings_clicked = QtCore.Signal()
     on_menu_exit_clicked = QtCore.Signal()
 
 
@@ -86,6 +87,14 @@ class SystemTray(QtWidgets.QSystemTrayIcon):
         self.capture_action.triggered.connect(self.com.on_menu_capture_clicked.emit)
         self.capture_action.setVisible(self.keep_in_tray)
         tray_menu.addAction(self.capture_action)
+
+        # L10N: Tray menu entry to open settings window
+        self.settings_action = QtGui.QAction(_("Settings"), tray_menu)
+        self.settings_action.setObjectName("settings")
+        self.settings_action.triggered.connect(self.com.on_menu_settings_clicked.emit)
+        tray_menu.addAction(self.settings_action)
+
+        tray_menu.addSeparator()
 
         # L10N: Tray menu entry for exiting NormCap completely.
         self.exit_action = QtGui.QAction(_("Exit"), tray_menu)

@@ -1,0 +1,72 @@
+# Builds an installable Linux package for each PR and uploads it as a
+# downloadable artifact, so reviewers can test PRs without building from source.
+
+name: PR Build – Linux
+
+on:
+  # DISABLED: pull_request:
+  #   types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: pr-build-linux-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Linux package
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5.0.0
+
+      - uses: ./.github/actions/setup-python-uv
+
+      - name: Prepare Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install \
+            python3-pil \
+            tesseract-ocr \
+            tesseract-ocr-eng \
+            tesseract-ocr-deu \
+            tesseract-ocr-jpn \
+            tesseract-ocr-chi-sim \
+            xclip
+          sudo apt-get install \
+            xvfb \
+            libxkbcommon-x11-0 \
+            libxcb-icccm4 \
+            libxcb-image0 \
+            libxcb-keysyms1 \
+            libxcb-randr0 \
+            libxcb-render-util0 \
+            libxcb-xinerama0 \
+            libxcb-xfixes0 \
+            libxcb-shape0 \
+            libxcb-cursor0 \
+            libegl1 \
+            libegl1-mesa-dev
+          sudo apt-get install ca-certificates
+          echo "XDG_SESSION_TYPE=gnome" >> $GITHUB_ENV
+          echo "QT_DEBUG_PLUGINS=1" >> $GITHUB_ENV
+          echo "QT_QPA_PLATFORM=xcb" >> $GITHUB_ENV
+
+      - name: Build package
+        shell: bash -l {0}
+        run: uv run poe bundle-dev
+
+      - name: Print briefcase log on failure
+        if: failure()
+        shell: bash -l {0}
+        run: |
+          (cat logs/briefcase*) || true
+          find build/normcap || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NormCap-${{ github.event_name == 'pull_request' && format('PR{0}', github.event.pull_request.number) || github.ref_name }}-Linux
+          path: bundle/*.AppImage
+          retention-days: 3

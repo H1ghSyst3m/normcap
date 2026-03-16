@@ -10,7 +10,7 @@ try:
 except PackageNotFoundError:
     __version__ = "unknown"
 
-app_id = "com.github.dynobo.normcap"
+app_id = "com.github.H1ghSyst3m.normcap"
 if os.environ.get("NORMCAP_DEV"):
     # This alternative app id is meant for normcap developers only. It allows to
     # setup two different NormCap versions (e.g. a stable one mand one for development)

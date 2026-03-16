@@ -5,6 +5,7 @@ This dialog should be shown at least once on the very first start to explain tho
 basic features.
 
 By toggling a checkbox, the user can opt out of showing the screen on startup.
+On Windows packaged builds, an autostart checkbox is also shown in the footer.
 """
 
 import enum
@@ -15,6 +16,7 @@ from pathlib import Path
 from PySide6 import QtCore, QtGui, QtWidgets
 
 from normcap.gui.localization import _
+from normcap.system import info
 
 
 @dataclass
@@ -42,6 +44,7 @@ class IntroductionDialog(QtWidgets.QDialog):
     def __init__(
         self,
         show_on_startup: bool,
+        autostart: bool = False,
         parent: QtWidgets.QWidget | None = None,
     ) -> None:
         super().__init__(parent=parent)
@@ -49,8 +52,23 @@ class IntroductionDialog(QtWidgets.QDialog):
         # L10N: Introduction window title
         self.setWindowTitle(_("Introduction to NormCap"))
         self.setWindowIcon(QtGui.QIcon(":normcap"))
-        self.setMinimumSize(1024, 650)
+        # On Windows a 5th section is shown; use a wider minimum to avoid
+        # horizontal scroll
+        min_width = 1280 if sys.platform == "win32" else 1024
+        self.setMinimumSize(min_width, 650)
         self.setModal(True)
+
+        self.autostart_checkbox: QtWidgets.QCheckBox | None = None
+        if sys.platform == "win32" and info.is_briefcase_package():
+            # L10N: Introduction window autostart checkbox
+            self.autostart_checkbox = QtWidgets.QCheckBox(
+                _("Start automatically at login")
+            )
+            self.autostart_checkbox.setObjectName("autostart")
+            self.autostart_checkbox.setToolTip(
+                _("Launch NormCap automatically when Windows starts.")
+            )
+            self.autostart_checkbox.setChecked(autostart)
 
         # L10N: Introduction window checkbox
         self.show_on_startup_checkbox = QtWidgets.QCheckBox(_("Show on startup"))
@@ -76,11 +94,18 @@ class IntroductionDialog(QtWidgets.QDialog):
         paste_shortcut_win32_linux = _("Ctrl + v")
         # L10N: Introduction window shortcut for pasting on macOS
         paste_shortcut_darwin = _("Cmd + v")
-        return [
+
+        # L10N: Introduction window step description
+        settings_text = _(
+            "Open the quick menu using the gear icon in the upper right "
+            "corner of your screen, "
+            "or use the full Settings dialog from the system tray icon for "
+            "all options."
+        )
+
+        sections = [
             Section(
-                # L10N: Introduction window step title
                 title=_("1. Select area"),
-                # L10N: Introduction window step description
                 text=_(
                     "Wait until a pink border appears around your screen, then select "
                     "the desired capture area."
@@ -88,9 +113,7 @@ class IntroductionDialog(QtWidgets.QDialog):
                 image=img_path / f"{prefix}-intro-1.png",
             ),
             Section(
-                # L10N: Introduction window step title
                 title=_("2. Wait for detection"),
-                # L10N: Introduction window step description
                 text=_(
                     "Processing takes time. Wait for a notification or a color "
                     "change of the system tray icon."
@@ -98,9 +121,7 @@ class IntroductionDialog(QtWidgets.QDialog):
                 image=img_path / f"{prefix}-intro-2.png",
             ),
             Section(
-                # L10N: Introduction window step title
                 title=_("3. Paste from clipboard"),
-                # L10N: Introduction window step description
                 text=_(
                     "The detection result will be copied to your system's clipboard. "
                     "Paste it into any application ({shortcut})."
@@ -112,16 +133,26 @@ class IntroductionDialog(QtWidgets.QDialog):
                 image=img_path / f"{prefix}-intro-3.png",
             ),
             Section(
-                # L10N: Introduction window step title
                 title=_("Settings & more"),
-                # L10N: Introduction window step description
-                text=_(
-                    "Open the menu using the gear icon in the upper right corner of "
-                    "corner your screen."
-                ),
+                text=settings_text,
                 image=img_path / f"{prefix}-intro-4.png",
             ),
         ]
+        if prefix == "win32":
+            sections.append(
+                Section(
+                    title=_("Global Hotkey"),
+                    text=_(
+                        "Trigger a capture from anywhere using the global hotkey. "
+                        "The default shortcut is Ctrl+Shift+J. "
+                        "You can change it anytime in the Settings dialog. "
+                        "Note: the global hotkey requires NormCap to be running "
+                        "in tray mode."
+                    ),
+                    image=img_path / f"{prefix}-intro-5.png",
+                )
+            )
+        return sections
 
     @staticmethod
     def _create_header() -> QtWidgets.QLabel:
@@ -169,20 +200,37 @@ class IntroductionDialog(QtWidgets.QDialog):
         vbox.addStretch()
 
         image_label = QtWidgets.QLabel()
-        image_label.setPixmap(QtGui.QPixmap(str(image.resolve())))
         image_label.setFixedWidth(230)
         image_label.setFixedHeight(400)
-        image_label.setScaledContents(True)
+        pixmap = QtGui.QPixmap(str(image.resolve()))
+        if not pixmap.isNull():
+            image_label.setPixmap(pixmap)
+            image_label.setScaledContents(True)
+        else:
+            image_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+            palette = image_label.palette()
+            bg = palette.color(QtGui.QPalette.ColorRole.Window).name()
+            border = palette.color(QtGui.QPalette.ColorRole.Mid).name()
+            text_color = palette.color(QtGui.QPalette.ColorRole.PlaceholderText).name()
+            image_label.setStyleSheet(
+                f"background-color: {bg};"
+                f" border: 1px solid {border};"
+                " border-radius: 4px;"
+                f" color: {text_color};"
+            )
+            image_label.setText(title)
         vbox.addWidget(image_label)
 
         return vbox
 
     def _create_footer(self) -> QtWidgets.QLayout:
         footer_hbox = QtWidgets.QHBoxLayout()
-        footer_hbox.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
         footer_hbox.setContentsMargins(0, 0, 2, 0)
 
-        # L10N: Introduction window checkbox
+        if self.autostart_checkbox is not None:
+            footer_hbox.addWidget(self.autostart_checkbox)
+        footer_hbox.addStretch()
+
         footer_hbox.addWidget(self.show_on_startup_checkbox)
         footer_hbox.addWidget(self.ok_button)
         return footer_hbox

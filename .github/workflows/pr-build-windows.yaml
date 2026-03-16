@@ -1,0 +1,67 @@
+# Builds an installable Windows package for each PR and uploads it as a
+# downloadable artifact, so reviewers can test PRs without building from source.
+
+name: PR Build – Windows
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: pr-build-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Windows package
+    runs-on: windows-2025
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5.0.0
+
+      - uses: ./.github/actions/setup-python-uv
+
+      - name: Prepare Windows
+        run: |
+          $url = "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.4.0.20240606.exe"
+          Invoke-WebRequest -Uri $url -OutFile "tesseract_installer.exe"
+          7z x tesseract_installer.exe -O"C:\Program Files\Tesseract-OCR"
+
+          $chi_sim_url = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/chi_sim.traineddata"
+          Invoke-WebRequest -Uri $chi_sim_url -OutFile "C:\Program Files\Tesseract-OCR\tessdata\chi_sim.traineddata"
+          $jpn_url = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/jpn.traineddata"
+          Invoke-WebRequest -Uri $jpn_url -OutFile "C:\Program Files\Tesseract-OCR\tessdata\jpn.traineddata"
+          $deu_url = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/deu.traineddata"
+          Invoke-WebRequest -Uri $deu_url -OutFile "C:\Program Files\Tesseract-OCR\tessdata\deu.traineddata"
+
+          $tesseract = "C:\Program Files\Tesseract-OCR\"
+          echo "$tesseract" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "TESSDATA_PREFIX=$tesseract\tessdata" >> $env:GITHUB_ENV
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force
+
+      - name: Build package
+        shell: bash -l {0}
+        run: uv run poe bundle-dev
+
+      - name: Print briefcase log on failure
+        if: failure()
+        shell: bash -l {0}
+        run: |
+          (cat logs/briefcase*) || true
+          find build/normcap || true
+
+      - name: Upload MSI installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: NormCap-${{ github.event_name == 'pull_request' && format('PR{0}', github.event.pull_request.number) || github.ref_name }}-Windows-Installer
+          path: bundle/*.msi
+          retention-days: 3
+
+      - name: Upload portable ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: NormCap-${{ github.event_name == 'pull_request' && format('PR{0}', github.event.pull_request.number) || github.ref_name }}-Windows-Portable
+          path: bundle/*.zip
+          retention-days: 3

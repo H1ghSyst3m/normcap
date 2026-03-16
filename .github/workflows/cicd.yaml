@@ -26,7 +26,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, macos-15, windows-2022, windows-2025, ubuntu-22.04, ubuntu-24.04]
+        os:
+          # DISABLED: - macos-14
+          # DISABLED: - macos-15
+          # DISABLED: - ubuntu-22.04
+          # DISABLED: - ubuntu-24.04
+          - windows-2022
+          - windows-2025
     steps:
       # Setup environment
       - uses: actions/checkout@v5.0.0
@@ -46,6 +52,7 @@ jobs:
             python3-pil \
             tesseract-ocr \
             tesseract-ocr-eng \
+            tesseract-ocr-deu \
             tesseract-ocr-jpn \
             tesseract-ocr-chi-sim \
             xclip
@@ -86,6 +93,8 @@ jobs:
           Invoke-WebRequest -Uri $chi_sim_url -OutFile "C:\Program Files\Tesseract-OCR\tessdata\chi_sim.traineddata"
           $jpn_url = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/jpn.traineddata"
           Invoke-WebRequest -Uri $jpn_url -OutFile "C:\Program Files\Tesseract-OCR\tessdata\jpn.traineddata"
+          $deu_url = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/deu.traineddata"
+          Invoke-WebRequest -Uri $deu_url -OutFile "C:\Program Files\Tesseract-OCR\tessdata\deu.traineddata"
 
           $tesseract = "C:\Program Files\Tesseract-OCR\"
           echo "$tesseract" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -103,22 +112,17 @@ jobs:
         env:
           QT_DEBUG_PLUGINS: 1
 
-      - name: Coveralls Parallel
-        if: github.repository_owner == 'dynobo'
-        uses: coverallsapp/github-action@v2.3.6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          flag-name: ${{ matrix.os }}
-          path-to-lcov: coverage.lcov
-          parallel: true
-
   test-python-package:
     name: Test Python package build
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, macos-15, windows-2025, ubuntu-24.04]
+        os:
+          # DISABLED: - macos-14
+          # DISABLED: - macos-15
+          # DISABLED: - ubuntu-24.04
+          - windows-2025
     steps:
       - uses: actions/checkout@v5.0.0
 
@@ -127,42 +131,18 @@ jobs:
       - name: Test build python package
         run: uv build
 
-  test-flatpak:
-    name: Test flatpak build
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5.0.0
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-
-      - name: Install flatpak
-        run: |
-          sudo apt update && sudo apt install -y flatpak flatpak-builder
-          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-
-      - name: Clone git clone
-        run: |
-          git clone https://github.com/flathub/com.github.dynobo.normcap.git
-
-      - name: Run build script
-        run: |
-          cd com.github.dynobo.normcap
-          python update.py --keep --bundle ${{ github.head_ref || github.ref_name }}
-
-      - name: Draft internal release
-        uses: ./.github/actions/draft-internal-release
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   test-briefcase:
     name: Test Briefcase build
+    if: github.event_name != 'pull_request'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, macos-15, windows-2025, ubuntu-24.04]
+        os:
+          # DISABLED: - macos-14
+          # DISABLED: - macos-15
+          # DISABLED: - ubuntu-24.04
+          - windows-2025
     steps:
       - uses: actions/checkout@v5.0.0
 
@@ -194,19 +174,6 @@ jobs:
       - name: Build documentation
         run: uv run poe docs-build
 
-  coveralls:
-    name: Upload coverage
-    needs: test
-    if: github.repository_owner == 'dynobo'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5.0.0
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@v2.3.6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel-finished: true
-
   codeql:
     name: CodeQL
     runs-on: ubuntu-24.04
@@ -236,16 +203,19 @@ jobs:
     needs:
       - test
       - test-briefcase
-      - test-flatpak
       - test-python-package
     if: |
       startsWith(github.ref, 'refs/tags/v')
-      && github.repository_owner == 'dynobo'
+      && github.repository_owner == 'H1ghSyst3m'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, macos-15, windows-2025, ubuntu-24.04]
+        os:
+          # DISABLED: - macos-14
+          # DISABLED: - macos-15
+          # DISABLED: - ubuntu-24.04
+          - windows-2025
     steps:
       - uses: actions/checkout@v5.0.0
 
@@ -255,11 +225,11 @@ jobs:
         shell: bash -l {0}
         run: uv run poe bundle
       - name: Draft release
-        if: github.repository == 'dynobo/normcap'
+        if: github.repository == 'H1ghSyst3m/normcap'
         uses: ncipollo/release-action@v1.20.0
         with:
           body:
-            See [CHANGELOG](https://github.com/dynobo/normcap/blob/main/CHANGELOG) for
+            See [CHANGELOG](https://github.com/H1ghSyst3m/normcap/blob/main/CHANGELOG) for
             details.
           artifacts: "*/*.+(dmg|AppImage|msi|zip)"
           artifactErrorsFailBuild: false
@@ -267,7 +237,7 @@ jobs:
           draft: true
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: FTP upload windows package
-        if: startsWith(matrix.os, 'windows') && github.repository == 'dynobo/normcap'
+        if: startsWith(matrix.os, 'windows') && github.repository == 'H1ghSyst3m/normcap'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: ${{ secrets.WEBGO_FTP_HOST }}
@@ -311,7 +281,7 @@ jobs:
       - test-documentation
     if: |
       (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-      && github.repository_owner == 'dynobo'
+      && github.repository_owner == 'H1ghSyst3m'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5.0.0

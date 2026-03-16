@@ -97,10 +97,10 @@ def extract_strings() -> None:
         [
             "pybabel",
             "extract",
-            "--copyright-holder=dynobo",
+            "--copyright-holder=H1ghSyst3m",
             "--project=NormCap",
             f"--version={_get_version()}",
-            "--msgid-bugs-address=dynobo@mailbox.org",
+            "--msgid-bugs-address=durmazmalik@protonmail.com",
             "--width=79",
             "--add-comments=L10N:",
             "--strip-comment-tag",

@@ -7,14 +7,12 @@ from normcap.gui.models import Urls
 DATE_FORMAT = "%Y-%m-%d"
 
 URLS = Urls(
-    releases="https://github.com/dynobo/normcap/releases",
-    changelog="https://github.com/dynobo/normcap/blob/main/CHANGELOG",
+    releases="https://github.com/H1ghSyst3m/normcap/releases",
+    changelog="https://github.com/H1ghSyst3m/normcap/blob/main/CHANGELOG",
     pypi="https://pypi.org/pypi/normcap",
-    github="https://github.com/dynobo/normcap",
-    issues="https://github.com/dynobo/normcap/issues",
-    faqs="https://dynobo.github.io/normcap/#faqs",
-    website="https://dynobo.github.io/normcap",
-    buymeacoffee="https://buymeacoffee.com/dynobo",
+    github="https://github.com/H1ghSyst3m/normcap",
+    issues="https://github.com/H1ghSyst3m/normcap/issues",
+    website="https://H1ghSyst3m.github.io/normcap",
 )
 
 TESSDATA_REPO = "https://github.com/tesseract-ocr/tessdata"
@@ -32,13 +30,13 @@ CMD_WAYLAND_PERMISSION = (
     "/org/freedesktop/impl/portal/PermissionStore \\<br>"
     "org.freedesktop.impl.portal.PermissionStore.SetPermission \\<br>"
     "string:'screenshot' boolean:true string:'screenshot' \\<br>"
-    "string:'com.github.dynobo.normcap' array:string:['yes']"
+    "string:'com.github.H1ghSyst3m.normcap' array:string:['yes']"
     "</code></p>"
 )
 
 CMD_FLATPAK_PERMISSION = (
     "<p><code>"
-    "flatpak permission-set screenshot screenshot com.github.dynobo.normcap yes"
+    "flatpak permission-set screenshot screenshot com.github.H1ghSyst3m.normcap yes"
     "</code></p>"
 )
 

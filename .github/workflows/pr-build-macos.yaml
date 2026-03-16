@@ -1,0 +1,47 @@
+# Builds an installable macOS package for each PR and uploads it as a
+# downloadable artifact, so reviewers can test PRs without building from source.
+
+name: PR Build – macOS
+
+on:
+  # DISABLED: pull_request:
+  #   types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: pr-build-macos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build macOS package
+    runs-on: macos-15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5.0.0
+
+      - uses: ./.github/actions/setup-python-uv
+
+      - name: Prepare macOS
+        run: |
+          brew install tesseract tesseract-lang dylibbundler
+          brew info tesseract
+
+      - name: Build package
+        shell: bash -l {0}
+        run: uv run poe bundle-dev
+
+      - name: Print briefcase log on failure
+        if: failure()
+        shell: bash -l {0}
+        run: |
+          (cat logs/briefcase*) || true
+          find build/normcap || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NormCap-${{ github.event_name == 'pull_request' && format('PR{0}', github.event.pull_request.number) || github.ref_name }}-macOS
+          path: bundle/*.dmg
+          retention-days: 3

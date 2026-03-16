@@ -29,15 +29,11 @@ class Urls:
     github: str
     issues: str
     website: str
-    faqs: str
-    buymeacoffee: str
 
     @property
     def releases_atom(self) -> str:
-        """URL to github releases rss feed."""
         return f"{self.releases}.atom"
 
     @property
     def pypi_json(self) -> str:
-        """URL to github releases rss feed."""
         return f"{self.pypi}/json"

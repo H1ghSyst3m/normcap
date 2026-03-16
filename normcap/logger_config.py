@@ -12,7 +12,7 @@ from normcap.system import info
 
 logger = logging.getLogger(__name__)
 
-_ISSUES_URLS = "https://github.com/dynobo/normcap/issues/new"
+_ISSUES_URLS = "https://github.com/H1ghSyst3m/normcap/issues/new"
 
 
 class ShortenPathnameFilter(logging.Filter):

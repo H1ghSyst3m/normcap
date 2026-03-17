@@ -15,7 +15,6 @@
 - Add Global Hotkeys: Trigger NormCap capture from anywhere using a configurable global keyboard shortcut.
 
 **Linux**:
-- Add clickable desktop notifications in FlatPak package. *(upstream)*
 - Add a new clipboard-handler `qt_wayland` to improve reliabilty of writing to clipboard on Wayland systems. *(upstream)*
 
 ---

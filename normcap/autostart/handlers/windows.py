@@ -22,13 +22,13 @@ def enable() -> bool:
 
     command = f'"{sys.executable}" --background-mode'
     try:
-        with winreg.OpenKey(
-            winreg.HKEY_CURRENT_USER,
+        with winreg.OpenKey(  # type: ignore[attr-defined]
+            winreg.HKEY_CURRENT_USER,  # type: ignore[attr-defined]
             _REG_PATH,
             0,
-            winreg.KEY_SET_VALUE,
+            winreg.KEY_SET_VALUE,  # type: ignore[attr-defined]
         ) as key:
-            winreg.SetValueEx(key, _REG_KEY, 0, winreg.REG_SZ, command)
+            winreg.SetValueEx(key, _REG_KEY, 0, winreg.REG_SZ, command)  # type: ignore[attr-defined]
     except OSError:
         logger.exception("Failed to write autostart registry key")
         return False
@@ -41,13 +41,13 @@ def disable() -> None:
     import winreg
 
     try:
-        with winreg.OpenKey(
-            winreg.HKEY_CURRENT_USER,
+        with winreg.OpenKey(  # type: ignore[attr-defined]
+            winreg.HKEY_CURRENT_USER,  # type: ignore[attr-defined]
             _REG_PATH,
             0,
-            winreg.KEY_SET_VALUE,
+            winreg.KEY_SET_VALUE,  # type: ignore[attr-defined]
         ) as key:
-            winreg.DeleteValue(key, _REG_KEY)
+            winreg.DeleteValue(key, _REG_KEY)  # type: ignore[attr-defined]
         logger.info("Autostart disabled.")
     except FileNotFoundError:
         logger.debug("Autostart registry key not found; nothing to delete.")
@@ -60,13 +60,13 @@ def is_enabled() -> bool:
     import winreg
 
     try:
-        with winreg.OpenKey(
-            winreg.HKEY_CURRENT_USER,
+        with winreg.OpenKey(  # type: ignore[attr-defined]
+            winreg.HKEY_CURRENT_USER,  # type: ignore[attr-defined]
             _REG_PATH,
             0,
-            winreg.KEY_READ,
+            winreg.KEY_READ,  # type: ignore[attr-defined]
         ) as key:
-            winreg.QueryValueEx(key, _REG_KEY)
+            winreg.QueryValueEx(key, _REG_KEY)  # type: ignore[attr-defined]
     except FileNotFoundError:
         return False
     except OSError:

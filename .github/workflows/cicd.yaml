@@ -253,27 +253,6 @@ jobs:
             **/*.wxs
             **/metainfo
 
-  deploy-pypi:
-    name: Publish to PyPi
-    needs: deploy-briefcase
-    runs-on: ubuntu-24.04
-    permissions:
-      # Used to authenticate to PyPI via OIDC.
-      # Used to sign the release's artifacts with sigstore-python.
-      id-token: write
-    steps:
-      - uses: actions/checkout@v5.0.0
-
-      - uses: ./.github/actions/setup-python-uv
-
-      - name: Build Python package
-        run: uv build
-      - name: Publish to PyPi
-        uses: pypa/gh-action-pypi-publish@v1.13.0
-        with:
-          verbose: true
-          print-hash: true
-
   release-documentation:
     name: Deploy github pages
     needs:

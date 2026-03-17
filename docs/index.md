@@ -7,7 +7,7 @@ hide:
 <div class="grid" markdown>
 
 <div markdown>
-# NormCap v0.6.0 {.md-title}
+# NormCap v0.7.0 {.md-title}
 
 <p class="md-subtitle">OCR-powered screenshot tool to capture text<br> instead of images.</p>
 
@@ -15,25 +15,17 @@ Packages with the
 [latest changes](https://github.com/H1ghSyst3m/normcap/blob/main/CHANGELOG) for your system:
 
 <div class="annotate" markdown>
-- [Download for **Windows**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64-Windows.msi)
+- [Download for **Windows**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.7.0/NormCap-0.7.0-x86_64-Windows.msi)
   <small>Installer, x86_64, ~120 MB</small>
-- [Download for **Windows**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64-Windows.zip)
+- [Download for **Windows**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.7.0/NormCap-0.7.0-x86_64-Windows.zip)
   <small>Portable, x86_64, ~120 MB</small>
-- [Download for **Linux (via Flathub)**](https://flathub.org/apps/details/com.github.H1ghSyst3m.normcap)
-  <small>x86_64, ~350 MB</small>
-- [Download for **Linux (AppImage)¹**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64.AppImage)
+- [Download for **Linux (AppImage)**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.7.0/NormCap-0.7.0-x86_64.AppImage)
   <small>x86_64, ~90 MB</small>
-- [Download for **macOS**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-x86_64-macOS.dmg)
+- [Download for **macOS**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.7.0/NormCap-0.7.0-x86_64-macOS.dmg)
   <small>x86_64, ~80 MB</small>
-- [Download for **macOS (M1)**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.6.0/NormCap-0.6.0-arm64-macOS.dmg)
+- [Download for **macOS (M1)**](https://github.com/H1ghSyst3m/normcap/releases/download/v0.7.0/NormCap-0.7.0-arm64-macOS.dmg)
   <small>arm64, ~65 MB</small>
 </div>
-
-… or install via
-[AUR](https://aur.archlinux.org/packages/normcap) or
-[PyPi](https://pypi.org/project/normcap/).
-
-¹ AppImage suppprt is deprecated. Please switch to Flatpak.
 </div>
 
 <div style="display:flex;align-items:center;text-align:center;" markdown>
